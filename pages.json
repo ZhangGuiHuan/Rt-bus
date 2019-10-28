@@ -1,0 +1,35 @@
+{
+	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+		{
+			"path": "pages/index/index",
+			"style": {
+				"navigationBarTitleText": "实时公交",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/select_city/select_city",
+			"style": {
+				"navigationBarTitleText": "选择城市"
+			}
+		},
+		{
+			"path": "pages/Route/Route",
+			"style": {
+				"navigationBarTitleText": "公交详情"
+			}
+		}
+	],
+		"permission": {
+		  "scope.userLocation": {
+		    "desc": "获取你的位置信息...." 
+		 }
+		},
+
+	"globalStyle": {
+		"navigationBarTextStyle": "light",
+		"navigationBarTitleText": "实时公交",
+		"navigationBarBackgroundColor": "#F0AD4E",
+		"backgroundColor": "#FFFFFF"
+	}
+}

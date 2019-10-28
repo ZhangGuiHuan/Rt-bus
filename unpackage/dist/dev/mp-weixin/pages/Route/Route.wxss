@@ -1,0 +1,20 @@
+
+.car{
+	width: 32rpx;
+    height: 32rpx;
+	margin-right: 10rpx;
+}
+.staname{
+	border-left: 5px solid #F0AD4E;
+}
+.staname_icon{ 
+	width:20rpx;
+	height:10rpx; 
+	position:absolute; 
+    left:60rpx; 
+	border-top-right-radius:5rpx;
+	border-bottom-right-radius: 5rpx;
+	content:""; 
+	background:#F0AD4E;
+}
+
