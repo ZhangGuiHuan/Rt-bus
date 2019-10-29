@@ -1,11 +1,12 @@
 <template>
 	<view class="content">
-		<view class="bg-gradual-blue padding" :style="[{paddingTop:CustomBar+ 'px'}]"> 
-			<block v-if="weather.status =='ok'" >
+		<view class="bg-gradual-blue padding" :style="[{paddingTop:CustomBar+ 'px'}]">
+			<block v-if="weather.status =='ok'">
 				<view class="flex justify-between align-start padding-top" @click="goTo">
 					<view class="flex align-center">
 						<view class="text-bold text-xl">
-							{{weather.basic.parent_city}} <text v-if="weather.basic.parent_city != weather.basic.location"> {{weather.basic.location}}</text>
+							{{weather.basic.parent_city}} <text v-if="weather.basic.parent_city != weather.basic.location">
+								{{weather.basic.location}}</text>
 							<text class="cuIcon-location"></text>
 						</view>
 						<view class='cu-tag  radius bg-cyan radius sm'>切换</view>
@@ -40,8 +41,10 @@
 					<view class="">暂无天气信息</view>
 				</view>
 			</block>
-			<view class="flex align-center justify-between searchform bg-white solid shadow padding text-xl radius basis-sm" :class="animation?'animation-shake':''">
-				<input style="flex: 1;" @confirm="InputBlur" :adjust-position="false" :value="searchBus" @input="searchBus = $event.detail.value" type="text" placeholder="搜索公交线路" confirm-type="search"></input>
+			<view class="flex align-center justify-between searchform bg-white solid shadow padding text-xl radius basis-sm"
+			 :class="animation?'animation-shake':''">
+				<input style="flex: 1;" @confirm="InputBlur" :adjust-position="false" :value="searchBus" @input="searchBus = $event.detail.value"
+				 type="text" placeholder="搜索公交线路" confirm-type="search"></input>
 				<view class="padding-left padding-right-sm" v-show="searchBus" @click="searchBus = ''">
 					<text class="cuIcon-backdelete"></text>
 				</view>
@@ -74,7 +77,7 @@
 			<view v-for="(item,index) in busList" :key="index" @click="getDetail(item)" class="text-bold padding solid-bottom">
 				<view class="flex justify-between">
 					<view class="">
-						<text class="cuIcon-titles text-yellow"></text>	{{item.bus_staname}} 路
+						<text class="cuIcon-titles text-yellow"></text> {{item.bus_staname}} 路
 					</view>
 					<view class="text-gray text-sm">
 						终点站: {{item.bus_endstan}}
@@ -92,111 +95,116 @@
 	export default {
 		data() {
 			return {
-				animation:false,
-				animationSearch:false,
+				animation: false,
+				animationSearch: false,
 				StatusBar: this.StatusBar,
 				CustomBar: this.CustomBar,
 				cityArray: citysArray,
-				dataList:[],
-				city:'',
-				cityid:'',
-				busList:[],
-				searchBus:'',
-				fixed_top:false,
-				searchList:[],
-				weather:{},
-				History:[]
+				dataList: [],
+				city: '',
+				cityid: '',
+				busList: [],
+				searchBus: '',
+				fixed_top: false,
+				searchList: [],
+				weather: {},
+				History: []
 			}
 		},
 		onLoad(option) {
 			var that = this
-			let ss= uni.getStorageSync('searchList')
+			let ss = uni.getStorageSync('searchList')
 			let History = uni.getStorageSync('History')
-			if(ss){
+			if (ss) {
 				that.searchList = ss
 			}
-			if(History){
+			if (History) {
 				that.History = History
 			}
 			console.log(option)
-			if(option.city){
-				var ccitydetile = JSON.parse(option.city) 
+			if (option.city) {
+				var ccitydetile = JSON.parse(option.city)
 				that.city = ccitydetile.city
 				that.cityid = ccitydetile.cityid
 				that.getWeather(ccitydetile.city)
 				return
 			}
-			if(that.cityid != ''){
+			if (that.cityid != '') {
 				return
 			}
 			uni.authorize({
 				scope: 'scope.userLocation',
 				success() {
 					uni.getLocation({
-					    type: 'gcj02', 
-					    success: function (res) {
-					        console.log('当前位置的经度：' + res.longitude);
-					        console.log('当前位置的纬度：' + res.latitude);
-							that.getWeather(res.latitude+','+res.longitude)
+						type: 'gcj02',
+						success: function(res) {
+							console.log('当前位置的经度：' + res.longitude);
+							console.log('当前位置的纬度：' + res.latitude);
+							that.getWeather(res.latitude + ',' + res.longitude)
 							//that.getLocal(res.latitude,res.longitude)
-					    }
+						}
 					});
 				}
 			})
-			
-			
+
+
 		},
 		onShareAppMessage(res) {
-		    if (res.from === 'button') {// 来自页面内分享按钮
-		      console.log(res.target)
-		    }
-		    return {
-		      title: '妈妈再也不用担心我错过公交车了！',
-			  imageUrl:'/static/sh2.jpg',
-		      path: '/pages/index/index'
-		    }
-		  },
-		 onPageScroll:function(e){
-		   // console.log(e.scrollTop);//{scrollTop:99}
-			if(e.scrollTop>280){
+			if (res.from === 'button') { // 来自页面内分享按钮
+				console.log(res.target)
+			}
+			return {
+				title: '妈妈再也不用担心我错过公交车了！',
+				imageUrl: '/static/sh2.jpg',
+				path: '/pages/index/index'
+			}
+		},
+		onPageScroll: function(e) {
+			// console.log(e.scrollTop);//{scrollTop:99}
+			if (e.scrollTop > 280) {
 				this.fixed_top = true
-			}else{
+			} else {
 				this.fixed_top = false
 			}
-		  },
+		},
 		methods: {
-			  goTo(){
+			goTo() {
 				uni.navigateTo({
-					url:"../select_city/select_city?city="+this.city
+					url: "../select_city/select_city?city=" + this.city
 				})
-			  },
-			  reMove(){
+			},
+			reMove() {
 				this.searchList = []
 				uni.removeStorageSync('searchList')
-			  },
-			  //获取天气
-			  getWeather(city){
-				  let that = this
-				  let data={url: 's6/weather/now',method: 'post'}
-				  let param={
-				  	location:city,
-					key:'573a0b25ec3944e7b90833d324ae70a7'
-				  }
-				  that.$request.httpRequest(data,param,2).then(res => {
-				  	console.log(res.data)
+			},
+			//获取天气
+			getWeather(city) {
+				let that = this
+				let data = {
+					url: 's6/weather/now',
+					method: 'post'
+				}
+				let param = {
+					location: city,
+					key: '573a0b25ec3944e7b90833d324ae70a7'
+				}
+				that.$request.httpRequest(data, param, 2).then(res => {
+					console.log(res.data)
 					var weather = res.data.HeWeather6[0]
-					if(weather.status =='ok'){
+					if (weather.status == 'ok') {
 						//that.city = weather.basic.parent_city+'市'
-						if(that.cityid ==''){
-							that.getCityid(weather.basic.parent_city+'市')
+						if (that.cityid == '') {
+							that.getCityid(weather.basic.parent_city + '市')
 						}
 						weather.update.loc = that.timeChangeover(weather.update.loc)
 						that.weather = weather
 					}
-				  },error => {console.log(error)})
-			  },
-			 // 获取当前地理位置
-			 /* getLocal(latitude, longitude) {
+				}, error => {
+					console.log(error)
+				})
+			},
+			// 获取当前地理位置
+			/* getLocal(latitude, longitude) {
 			    let that = this;
 			    that.$QQMapWX.reverseGeocoder({
 			      location: {
@@ -217,137 +225,140 @@
 			      }
 			    });
 			  }, */
-			getCityid(name){
+			getCityid(name) {
 				for (var i = 0; i < this.cityArray.length; i++) {
 					for (var j = 0; j < this.cityArray[i].list.length; j++) {
-				 		if(this.cityArray[i].list[j]["city"] == name){
-				 			console.log('cityid',this.cityArray[i].list[j].cityid)
-				 			this.cityid = this.cityArray[i].list[j].cityid
-				 		}
+						if (this.cityArray[i].list[j]["city"] == name) {
+							console.log('cityid', this.cityArray[i].list[j].cityid)
+							this.cityid = this.cityArray[i].list[j].cityid
+						}
 					}
-					
-				}	
+
+				}
 			},
-			InputBlur(e){
+			InputBlur(e) {
 				console.log(e)
-				
-				if(this.cityid ==''){
+
+				if (this.cityid == '') {
 					this.animation = true
-					setTimeout(()=>{
+					setTimeout(() => {
 						this.animation = false;
 					}, 500)
 					uni.showModal({
-						title:'提示',
-						content:'无法获取当前定位',
-						showCancel:false
+						title: '提示',
+						content: '无法获取当前定位',
+						showCancel: false
 					})
 					return
 				}
 				var keywords = e.detail ? e.detail.value : e
-				if(keywords ==''){
+				if (keywords == '') {
 					this.animation = true
-					setTimeout(()=>{
+					setTimeout(() => {
 						this.animation = false;
 					}, 500)
 					uni.showToast({
-						title:'请输入线路',
-						icon:'none'
+						title: '请输入线路',
+						icon: 'none'
 					})
 					return
 				}
 				this.animationSearch = true
-				setTimeout(()=>{
+				setTimeout(() => {
 					this.animationSearch = false;
 				}, 500)
 				this.getBusList(keywords)
 			},
-			getBusList(keywords){
-				uni.showLoading({title:'加载中'})
+			getBusList(keywords) {
+				uni.showLoading({
+					title: '加载中'
+				})
 				var that = this
-				let data={url: 'rt_bus_luxian',method: 'post',}
-				let param={
-					cityid:that.cityid,
-					keywords:keywords
+				let data = {
+					url: 'rt_bus_luxian',
+					method: 'post',
 				}
-				that.$request.httpTokenRequest(data,param).then(res => {
+				let param = {
+					cityid: that.cityid,
+					keywords: keywords
+				}
+				that.$request.httpTokenRequest(data, param).then(res => {
 					uni.hideLoading()
 					console.log(res.data)
-					if(res.data.error_code == '003'){
+					if (res.data.error_code == '003') {
 						uni.showModal({
-							title:'提示',
-							content:res.data.error_msg,
-							showCancel:false
+							title: '提示',
+							content: res.data.error_msg,
+							showCancel: false
 						})
 						return
 					}
-					if(this.searchList !='' && this.searchList.indexOf(keywords) ==-1){
+					if (this.searchList != '' && this.searchList.indexOf(keywords) == -1) {
 						this.searchList.push(keywords)
-						uni.setStorageSync('searchList',this.searchList)
-					}else if(this.searchList ==''){
+						uni.setStorageSync('searchList', this.searchList)
+					} else if (this.searchList == '') {
 						this.searchList[0] = keywords
-						uni.setStorageSync('searchList',this.searchList)
+						uni.setStorageSync('searchList', this.searchList)
 					}
 					that.busList = res.data.returl_list
-				},error => {console.log(error)})
-			},
-			getDetail(item){
-				console.log(item)
-				if(this.History !='' && this.History.indexOf(item) ==-1){
-					this.History.push(item)
-					uni.setStorageSync('History',this.History)
-				}else if(this.History ==''){
-					this.History[0] = item
-					uni.setStorageSync('History',this.History)
-				}
-				uni.navigateTo({
-					url:"../Route/Route?bus_linenum="+item.bus_linenum+"&bus_linestrid="+item.bus_linestrid+"&bus_staname="+item.bus_staname+"&cityid="+this.cityid
+				}, error => {
+					console.log(error)
 				})
 			},
-			 timeChangeover: function(time) {
-			  var result;
-			  var minute = 1000 * 60;
-			  var hour = minute * 60;
-			  var day = hour * 24;
-			  var halfamonth = day * 15;
-			  var month = day * 30;
-			  var now = new Date().getTime();
-			  if(time){
-			    time = time.replace(/-/g, '/');
-			  }
-			  var dateTimeStamp = Date.parse(time);
-			  var diffValue = now - dateTimeStamp;
-			  if (diffValue < 0) {
-			    return;
-			  }
-			  var monthC = diffValue / month;
-			  var weekC = diffValue / (7 * day);
-			  var dayC = diffValue / day;
-			  var hourC = diffValue / hour;
-			  var minC = diffValue / minute;
-			  if (monthC >= 1) {
-			    if (monthC <= 12) {
-			      result = "" + parseInt(monthC) + "月前";
-			    }
-			    else {
-			     // result = "" + parseInt(monthC / 12) + "年前";
-			      result = formatTime(new Date(time));
-			    }
-			  }
-			  else if (weekC >= 1) {
-			    result = "" + parseInt(weekC) + "周前";
-			  }
-			  else if (dayC >= 1) {
-			    result = "" + parseInt(dayC) + "天前";
-			  }
-			  else if (hourC >= 1) {
-			    result = "" + parseInt(hourC) + "小时前";
-			  }
-			  else if (minC >= 1) {
-			    result = "" + parseInt(minC) + "分钟前";
-			  } else {
-			    result = "刚刚";
-			  }
-			  return result;
+			getDetail(item) {
+				console.log(item)
+				if (this.History != '' && this.History.indexOf(item) == -1) {
+					this.History.push(item)
+					uni.setStorageSync('History', this.History)
+				} else if (this.History == '') {
+					this.History[0] = item
+					uni.setStorageSync('History', this.History)
+				}
+				uni.navigateTo({
+					url: "../Route/Route?bus_linenum=" + item.bus_linenum + "&bus_linestrid=" + item.bus_linestrid + "&bus_staname=" +
+						item.bus_staname + "&cityid=" + this.cityid
+				})
+			},
+			timeChangeover: function(time) {
+				var result;
+				var minute = 1000 * 60;
+				var hour = minute * 60;
+				var day = hour * 24;
+				var halfamonth = day * 15;
+				var month = day * 30;
+				var now = new Date().getTime();
+				if (time) {
+					time = time.replace(/-/g, '/');
+				}
+				var dateTimeStamp = Date.parse(time);
+				var diffValue = now - dateTimeStamp;
+				if (diffValue < 0) {
+					return;
+				}
+				var monthC = diffValue / month;
+				var weekC = diffValue / (7 * day);
+				var dayC = diffValue / day;
+				var hourC = diffValue / hour;
+				var minC = diffValue / minute;
+				if (monthC >= 1) {
+					if (monthC <= 12) {
+						result = "" + parseInt(monthC) + "月前";
+					} else {
+						// result = "" + parseInt(monthC / 12) + "年前";
+						result = formatTime(new Date(time));
+					}
+				} else if (weekC >= 1) {
+					result = "" + parseInt(weekC) + "周前";
+				} else if (dayC >= 1) {
+					result = "" + parseInt(dayC) + "天前";
+				} else if (hourC >= 1) {
+					result = "" + parseInt(hourC) + "小时前";
+				} else if (minC >= 1) {
+					result = "" + parseInt(minC) + "分钟前";
+				} else {
+					result = "刚刚";
+				}
+				return result;
 			},
 
 		}
@@ -355,7 +366,7 @@
 </script>
 
 <style>
-.center_box{
-	margin-top: 100upx;
-}
+	.center_box {
+		margin-top: 100upx;
+	}
 </style>
