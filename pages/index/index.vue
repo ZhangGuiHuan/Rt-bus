@@ -1,5 +1,5 @@
 <template>
-	<view class="content">1212
+	<view class="content">
 		<view class="bg-gradual-blue padding" :style="[{paddingTop:CustomBar+ 'px'}]">
 			<block v-if="weather.status =='ok'">
 				<view class="flex justify-between align-start padding-top" @click="goTo">
