@@ -173,6 +173,31 @@
 					url: "../select_city/select_city?city=" + this.city
 				})
 			},
+			/* goTo() {
+				// let plugin = requirePlugin("subway");
+				let key = 'Q7VBZ-F6NW5-UTTIF-QFN5D-MYAHZ-NWBSZ'; //使用在腾讯位置服务申请的key
+				let referer = '查查BUS'; //调用插件的app的名称
+				// uni.navigateTo({
+				//   url: 'plugin://subway/index?key=' + key + '&referer=' + referer 
+				// });
+				let plugin = requirePlugin('routePlan');
+				let location = JSON.stringify({ //终点
+					//'name': '员村',
+					'latitude': this.locationInfo.latitude,
+					'longitude': this.locationInfo.longitude
+				});
+				const category = '生活服务,娱乐休闲';
+				uni.navigateTo({
+					url: 'plugin://chooseLocation/index?key=' + key + '&referer=' + referer + '&location=' + location + '&category' +
+						category
+				});
+				uni.navigateTo({
+				     url: 'plugin://routePlan/index?key=' + key + '&referer=' + referer + '&endPoint=' + endPoint
+				 });
+				uni.redirectTo({
+					url:"../select_city/select_city?city="+this.city
+				})
+			}, */
 			reMove() {
 				this.searchList = []
 				uni.removeStorageSync('searchList')
