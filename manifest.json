@@ -78,7 +78,7 @@
 			   "version": "1.0.0",
 			   "provider": "wx76a9a06e5b4e693e"
 			}
-		}  
+		}
     },
     "mp-alipay" : {
         "usingComponents" : true
