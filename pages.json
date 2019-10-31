@@ -29,7 +29,7 @@
 	"globalStyle": {
 		"navigationBarTextStyle": "light",
 		"navigationBarTitleText": "实时公交",
-		"navigationBarBackgroundColor": "#F0AD4E",
+		"navigationBarBackgroundColor": "#03D2FB",
 		"backgroundColor": "#FFFFFF"
 	}
 }

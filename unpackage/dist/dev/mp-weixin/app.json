@@ -8,12 +8,26 @@
   "window": {
     "navigationBarTextStyle": "white",
     "navigationBarTitleText": "实时公交",
-    "navigationBarBackgroundColor": "#F0AD4E",
+    "navigationBarBackgroundColor": "#03D2FB",
     "backgroundColor": "#FFFFFF"
   },
   "permission": {
     "scope.userLocation": {
       "desc": "定位获取当前定位"
+    }
+  },
+  "plugins": {
+    "subway": {
+      "version": "1.0.4",
+      "provider": "wx6aaf93c4435fa1c1"
+    },
+    "routePlan": {
+      "version": "1.0.1",
+      "provider": "wx50b5593e81dd937a"
+    },
+    "chooseLocation": {
+      "version": "1.0.0",
+      "provider": "wx76a9a06e5b4e693e"
     }
   },
   "usingComponents": {

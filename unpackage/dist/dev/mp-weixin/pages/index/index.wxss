@@ -1,5 +1,9 @@
 
-.center_box{
+.center_box {
 	margin-top: 100rpx;
+}
+.grid-img {
+	width: 64rpx;
+	height: 64rpx;
 }
 

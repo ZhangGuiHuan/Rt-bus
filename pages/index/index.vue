@@ -54,14 +54,25 @@
 				</view>
 			</view>
 		</view>
-		<view class="padding text-gray flex align-center flex-wrap">
-			<view class="padding">搜索历史</view>
-			<view v-for="(item,index) in searchList" :key="index" class="cu-tag radius bg-white text-gray" @click="getBusList(item)">{{item}}</view>
-			<view class="padding-left" @click="reMove"><text class="cuIcon-delete"></text></view>
+		<view class="bg-white padding">
+			<view class="grid text-center col-2">
+				<view class="solids-right" @click="routePlan">
+					<image class="grid-img" src="/static/1.png"></image>
+					<view class="">路线规划</view>
+				</view>
+				<view class="" @click="goSubway">
+					<image class="grid-img" src="/static/3.png"></image>
+					<view class="">地铁图</view>
+				</view>
+				<!-- <view @click="chooseLocation">
+					<image class="grid-img" src="/static/2.png"></image>
+					<view class="">地图选点</view>
+				</view> -->
+			</view>
 		</view>
 		<view class="margin bg-white" v-if="History !=''">
 			<view class="text-bold padding">历史线路</view>
-			<view v-for="(item,index) in History" :key="index" @click="getDetail(item)" class="text-bold padding solid-bottom">
+			<view v-for="(item,index) in History" :key="index" @click="getHistory(item)" class="text-bold padding solid-bottom">
 				<view class="flex justify-between">
 					<view class="">
 						<text class="cuIcon-titles text-cyan"></text> {{item.bus_staname}} 路
@@ -92,6 +103,7 @@
 </template>
 <script>
 	import citysArray from '../../utils/citys.js';
+	const chooseLocation = requirePlugin('chooseLocation')
 	export default {
 		data() {
 			return {
@@ -106,18 +118,23 @@
 				busList: [],
 				searchBus: '',
 				fixed_top: false,
-				searchList: [],
 				weather: {},
-				History: []
+				History: [],
+				locationInfo: {},
+				key: 'Q7VBZ-F6NW5-UTTIF-QFN5D-MYAHZ-NWBSZ', //使用在腾讯位置服务申请的key
+				referer: '查查BUS' //调用插件的app的名称
 			}
+		},
+		onShow() {
+			 const location = chooseLocation.getLocation();
+			 console.log('location',location)
+			 if(location){
+				 //this.routePlan(location)
+			 }
 		},
 		onLoad(option) {
 			var that = this
-			let ss = uni.getStorageSync('searchList')
 			let History = uni.getStorageSync('History')
-			if (ss) {
-				that.searchList = ss
-			}
 			if (History) {
 				that.History = History
 			}
@@ -138,6 +155,7 @@
 					uni.getLocation({
 						type: 'gcj02',
 						success: function(res) {
+							that.locationInfo = res
 							console.log('当前位置的经度：' + res.longitude);
 							console.log('当前位置的纬度：' + res.latitude);
 							that.getWeather(res.latitude + ',' + res.longitude)
@@ -173,6 +191,34 @@
 					url: "../select_city/select_city?city=" + this.city
 				})
 			},
+			chooseLocation() {
+				let category = '公交车站,地铁站,火车站';
+				let location = JSON.stringify({
+					latitude: this.locationInfo.latitude,
+					longitude: this.locationInfo.longitude
+				});
+				uni.navigateTo({
+					url: 'plugin://chooseLocation/index?key=' + this.key + '&referer=' + this.referer + '&location=' + location +
+						'&category=' + category
+				});
+			},
+			goSubway() {
+				let plugin = requirePlugin("subway");
+				uni.navigateTo({
+					url: 'plugin://subway/index?key=' + this.key + '&referer=' + this.referer
+				});
+			},
+			routePlan(loca) {
+				let plugin = requirePlugin('routePlan');
+				let endPoint = JSON.stringify({ //终点
+					'name': loca.name,
+					latitude: loca.latitude || this.locationInfo.latitude,
+					longitude: loca.longitude || this.locationInfo.longitude
+				});
+				uni.navigateTo({
+					url: 'plugin://routePlan/index?key=' + this.key + '&referer=' + this.referer + '&endPoint=' + endPoint
+				});
+			},
 			/* goTo() {
 				// let plugin = requirePlugin("subway");
 				let key = 'Q7VBZ-F6NW5-UTTIF-QFN5D-MYAHZ-NWBSZ'; //使用在腾讯位置服务申请的key
@@ -198,10 +244,6 @@
 					url:"../select_city/select_city?city="+this.city
 				})
 			}, */
-			reMove() {
-				this.searchList = []
-				uni.removeStorageSync('searchList')
-			},
 			//获取天气
 			getWeather(city) {
 				let that = this
@@ -317,24 +359,24 @@
 							showCancel: false
 						})
 						return
+					} else {
+						that.busList = res.data.returl_list
 					}
-					if (this.searchList != '' && this.searchList.indexOf(keywords) == -1) {
-						this.searchList.push(keywords)
-						uni.setStorageSync('searchList', this.searchList)
-					} else if (this.searchList == '') {
-						this.searchList[0] = keywords
-						uni.setStorageSync('searchList', this.searchList)
-					}
-					that.busList = res.data.returl_list
 				}, error => {
 					console.log(error)
 				})
 			},
 			getDetail(item) {
 				console.log(item)
-				if (this.History != '' && this.History.indexOf(item) == -1) {
-					this.History.push(item)
-					uni.setStorageSync('History', this.History)
+				item.cityid = this.cityid
+				var History = this.History
+				if (History != '' && History.indexOf(item) == -1) {
+					if(History.length >= 5){
+						History.splice(4,3)
+					}
+					History.unshift(item)
+					this.History = History
+					uni.setStorageSync('History', History)
 				} else if (this.History == '') {
 					this.History[0] = item
 					uni.setStorageSync('History', this.History)
@@ -342,6 +384,13 @@
 				uni.navigateTo({
 					url: "../Route/Route?bus_linenum=" + item.bus_linenum + "&bus_linestrid=" + item.bus_linestrid + "&bus_staname=" +
 						item.bus_staname + "&cityid=" + this.cityid
+				})
+			},
+			getHistory(item) {
+				console.log(item)
+				uni.navigateTo({
+					url: "../Route/Route?bus_linenum=" + item.bus_linenum + "&bus_linestrid=" + item.bus_linestrid + "&bus_staname=" +
+						item.bus_staname + "&cityid=" + item.cityid
 				})
 			},
 			timeChangeover: function(time) {
@@ -393,5 +442,10 @@
 <style>
 	.center_box {
 		margin-top: 100upx;
+	}
+
+	.grid-img {
+		width: 64upx;
+		height: 64upx;
 	}
 </style>
