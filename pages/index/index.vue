@@ -43,9 +43,9 @@
 			</block>
 			<view class="flex align-center justify-between searchform bg-white solid shadow padding text-xl radius basis-sm"
 			 :class="animation?'animation-shake':''">
-				<input style="flex: 1;" @confirm="InputBlur" :adjust-position="false" :value="searchBus" @input="searchBus = $event.detail.value"
-				 type="text" placeholder="搜索公交线路" confirm-type="search"></input>
-				<view class="padding-left padding-right-sm" v-show="searchBus" @click="searchBus = ''">
+				<input style="flex: 1;" @confirm="InputBlur" @focus="busList = ''" :adjust-position="false" :value="searchBus"
+				 @input="searchBus = $event.detail.value" type="text" placeholder="搜索公交线路" confirm-type="search"></input>
+				<view class="padding-left padding-right-sm" v-show="searchBus" @click="searchBus = busList ='' ">
 					<text class="cuIcon-backdelete"></text>
 				</view>
 				<view class="padding-left solids-left" @click="InputBlur(searchBus)">
@@ -70,7 +70,7 @@
 				</view> -->
 			</view>
 		</view>
-		<view class="margin bg-white" v-if="History !=''">
+		<view class="margin bg-white" v-if="History !='' && busList ==''">
 			<view class="text-bold padding">历史线路</view>
 			<view v-for="(item,index) in History" :key="index" @click="getHistory(item)" class="text-bold padding solid-bottom">
 				<view class="flex justify-between">
@@ -126,11 +126,11 @@
 			}
 		},
 		onShow() {
-			 const location = chooseLocation.getLocation();
-			 console.log('location',location)
-			 if(location){
-				 //this.routePlan(location)
-			 }
+			const location = chooseLocation.getLocation();
+			console.log('location', location)
+			if (location) {
+				//this.routePlan(location)
+			}
 		},
 		onLoad(option) {
 			var that = this
@@ -177,14 +177,6 @@
 				path: '/pages/index/index'
 			}
 		},
-		onPageScroll: function(e) {
-			// console.log(e.scrollTop);//{scrollTop:99}
-			if (e.scrollTop > 280) {
-				this.fixed_top = true
-			} else {
-				this.fixed_top = false
-			}
-		},
 		methods: {
 			goTo() {
 				uni.navigateTo({
@@ -192,7 +184,7 @@
 				})
 			},
 			chooseLocation() {
-				let category = '公交车站,地铁站,火车站';
+				let category = '公交车站,地铁站,火车站'
 				let location = JSON.stringify({
 					latitude: this.locationInfo.latitude,
 					longitude: this.locationInfo.longitude
@@ -219,31 +211,6 @@
 					url: 'plugin://routePlan/index?key=' + this.key + '&referer=' + this.referer + '&endPoint=' + endPoint
 				});
 			},
-			/* goTo() {
-				// let plugin = requirePlugin("subway");
-				let key = 'Q7VBZ-F6NW5-UTTIF-QFN5D-MYAHZ-NWBSZ'; //使用在腾讯位置服务申请的key
-				let referer = '查查BUS'; //调用插件的app的名称
-				// uni.navigateTo({
-				//   url: 'plugin://subway/index?key=' + key + '&referer=' + referer 
-				// });
-				let plugin = requirePlugin('routePlan');
-				let location = JSON.stringify({ //终点
-					//'name': '员村',
-					'latitude': this.locationInfo.latitude,
-					'longitude': this.locationInfo.longitude
-				});
-				const category = '生活服务,娱乐休闲';
-				uni.navigateTo({
-					url: 'plugin://chooseLocation/index?key=' + key + '&referer=' + referer + '&location=' + location + '&category' +
-						category
-				});
-				uni.navigateTo({
-				     url: 'plugin://routePlan/index?key=' + key + '&referer=' + referer + '&endPoint=' + endPoint
-				 });
-				uni.redirectTo({
-					url:"../select_city/select_city?city="+this.city
-				})
-			}, */
 			//获取天气
 			getWeather(city) {
 				let that = this
@@ -270,28 +237,6 @@
 					console.log(error)
 				})
 			},
-			// 获取当前地理位置
-			/* getLocal(latitude, longitude) {
-			    let that = this;
-			    that.$QQMapWX.reverseGeocoder({
-			      location: {
-			        latitude: latitude,
-			        longitude: longitude
-			      },
-			      success: function (res) {
-			        console.log('resres',res);
-					 that.city  = res.result.ad_info.city
-					 that.getCityid(res.result.ad_info.city)
-					 
-			      },
-			      fail: function (res) {
-			        console.log(res);
-			      },
-			      complete: function (res) {
-			        // console.log(res);
-			      }
-			    });
-			  }, */
 			getCityid(name) {
 				for (var i = 0; i < this.cityArray.length; i++) {
 					for (var j = 0; j < this.cityArray[i].list.length; j++) {
@@ -370,16 +315,26 @@
 				console.log(item)
 				item.cityid = this.cityid
 				var History = this.History
-				if (History != '' && History.indexOf(item) == -1) {
-					if(History.length >= 5){
-						History.splice(4,3)
-					}
-					History.unshift(item)
+				if (History == '') {
+					History[0] = item
 					this.History = History
 					uni.setStorageSync('History', History)
-				} else if (this.History == '') {
-					this.History[0] = item
-					uni.setStorageSync('History', this.History)
+				} else {
+					var exit = false
+					for (var i = 0; i < History.length; i++) {
+						if (item.bus_staname == History[i].bus_staname) {
+							exit = false
+							break;
+						} else {
+							exit = true
+						}
+					}
+					if (exit) {
+						History.unshift(item)
+						History.splice(5, 1)
+						this.History = History
+						uni.setStorageSync('History', History)
+					}
 				}
 				uni.navigateTo({
 					url: "../Route/Route?bus_linenum=" + item.bus_linenum + "&bus_linestrid=" + item.bus_linestrid + "&bus_staname=" +
