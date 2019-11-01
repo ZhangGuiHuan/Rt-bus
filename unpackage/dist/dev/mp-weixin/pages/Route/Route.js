@@ -157,20 +157,14 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
 var _default =
 {
   data: function data() {
     return {
       bus_num: {},
       cityid: -1,
-      busDetail: [] };
+      busDetail: [],
+      select: false };
 
   },
   onLoad: function onLoad(option) {
@@ -188,8 +182,13 @@ var _default =
     },
     //详细详细信息
     getDetail: function getDetail(other_lineid) {var _this = this;
-      uni.showLoading({ title: '加载中' });
-      var data = { url: 'rt_bus_rt', method: 'post' };
+      uni.showLoading({
+        title: '加载中' });
+
+      var data = {
+        url: 'rt_bus_rt',
+        method: 'post' };
+
       var bus_num = this.bus_num;
       var param = {
         cityid: this.cityid,
@@ -201,8 +200,22 @@ var _default =
         uni.hideLoading();
         console.log(res.data);
         _this.searchBus = true;
-        _this.busDetail = res.data.returl_list;
-      }, function (error) {console.log(error);});
+        var busDetail = res.data.returl_list;
+        for (var i = 0; i < busDetail.stations.length; i++) {
+          for (var j = 0; j < busDetail.buses.length; j++) {
+            if (busDetail.buses[j].dis_stat - 1 == i) {
+              busDetail.stations[i].bus = true;
+              busDetail.stations[i].distance = busDetail.buses[j].distance;
+            }
+          }
+        }
+        _this.busDetail = busDetail;
+      }, function (error) {
+        console.log(error);
+      });
+    },
+    selectBus: function selectBus(index) {
+      this.select = index;
     } } };exports.default = _default;
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 1)["default"]))
 

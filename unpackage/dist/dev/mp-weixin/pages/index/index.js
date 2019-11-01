@@ -86,11 +86,15 @@ var render = function() {
   var _c = _vm._self._c || _h
   if (!_vm._isMounted) {
     _vm.e0 = function($event) {
-      _vm.searchBus = $event.detail.value
+      _vm.busList = ""
     }
 
     _vm.e1 = function($event) {
-      _vm.searchBus = ""
+      _vm.searchBus = $event.detail.value
+    }
+
+    _vm.e2 = function($event) {
+      _vm.searchBus = _vm.busList = ""
     }
   }
 }
@@ -335,41 +339,8 @@ var chooseLocation = requirePlugin('chooseLocation');var _default = { data: func
     };}, onShow: function onShow() {var location = chooseLocation.getLocation();console.log('location', location);if (location) {//this.routePlan(location)
     }}, onLoad: function onLoad(option) {var that = this;var History = uni.getStorageSync('History');if (History) {that.History = History;}console.log(option);if (option.city) {var ccitydetile = JSON.parse(option.city);that.city = ccitydetile.city;that.cityid = ccitydetile.cityid;that.getWeather(ccitydetile.city);return;}if (that.cityid != '') {return;}uni.authorize({ scope: 'scope.userLocation', success: function success() {uni.getLocation({ type: 'gcj02', success: function success(res) {that.locationInfo = res;console.log('当前位置的经度：' + res.longitude);console.log('当前位置的纬度：' + res.latitude);that.getWeather(res.latitude + ',' + res.longitude); //that.getLocal(res.latitude,res.longitude)
           } });} });}, onShareAppMessage: function onShareAppMessage(res) {if (res.from === 'button') {// 来自页面内分享按钮
-      console.log(res.target);}return { title: '妈妈再也不用担心我错过公交车了！', imageUrl: '/static/sh2.jpg', path: '/pages/index/index' };}, onPageScroll: function onPageScroll(e) {// console.log(e.scrollTop);//{scrollTop:99}
-    if (e.scrollTop > 280) {this.fixed_top = true;} else {this.fixed_top = false;}}, methods: { goTo: function goTo() {uni.navigateTo({ url: "../select_city/select_city?city=" + this.city });}, chooseLocation: function chooseLocation() {var category = '公交车站,地铁站,火车站';var location = JSON.stringify({ latitude: this.locationInfo.latitude, longitude: this.locationInfo.longitude });uni.navigateTo({ url: 'plugin://chooseLocation/index?key=' + this.key + '&referer=' + this.referer + '&location=' + location + '&category=' + category });}, goSubway: function goSubway() {var plugin = requirePlugin("subway");uni.navigateTo({ url: 'plugin://subway/index?key=' + this.key + '&referer=' + this.referer });}, routePlan: function routePlan(loca) {var plugin = requirePlugin('routePlan');var endPoint = JSON.stringify({ //终点
-        'name': loca.name, latitude: loca.latitude || this.locationInfo.latitude,
-        longitude: loca.longitude || this.locationInfo.longitude });
-
-      uni.navigateTo({
-        url: 'plugin://routePlan/index?key=' + this.key + '&referer=' + this.referer + '&endPoint=' + endPoint });
-
-    },
-    /* goTo() {
-       	// let plugin = requirePlugin("subway");
-       	let key = 'Q7VBZ-F6NW5-UTTIF-QFN5D-MYAHZ-NWBSZ'; //使用在腾讯位置服务申请的key
-       	let referer = '查查BUS'; //调用插件的app的名称
-       	// uni.navigateTo({
-       	//   url: 'plugin://subway/index?key=' + key + '&referer=' + referer 
-       	// });
-       	let plugin = requirePlugin('routePlan');
-       	let location = JSON.stringify({ //终点
-       		//'name': '员村',
-       		'latitude': this.locationInfo.latitude,
-       		'longitude': this.locationInfo.longitude
-       	});
-       	const category = '生活服务,娱乐休闲';
-       	uni.navigateTo({
-       		url: 'plugin://chooseLocation/index?key=' + key + '&referer=' + referer + '&location=' + location + '&category' +
-       			category
-       	});
-       	uni.navigateTo({
-       	     url: 'plugin://routePlan/index?key=' + key + '&referer=' + referer + '&endPoint=' + endPoint
-       	 });
-       	uni.redirectTo({
-       		url:"../select_city/select_city?city="+this.city
-       	})
-       }, */
-    //获取天气
+      console.log(res.target);}return { title: '妈妈再也不用担心我错过公交车了！', imageUrl: '/static/sh2.jpg', path: '/pages/index/index' };}, methods: { goTo: function goTo() {uni.navigateTo({ url: "../select_city/select_city?city=" + this.city });}, chooseLocation: function chooseLocation() {var category = '公交车站,地铁站,火车站';var location = JSON.stringify({ latitude: this.locationInfo.latitude, longitude: this.locationInfo.longitude });uni.navigateTo({ url: 'plugin://chooseLocation/index?key=' + this.key + '&referer=' + this.referer + '&location=' + location + '&category=' + category });}, goSubway: function goSubway() {var plugin = requirePlugin("subway");uni.navigateTo({ url: 'plugin://subway/index?key=' + this.key + '&referer=' + this.referer });}, routePlan: function routePlan(loca) {var plugin = requirePlugin('routePlan');var endPoint = JSON.stringify({ //终点
+        'name': loca.name, latitude: loca.latitude || this.locationInfo.latitude, longitude: loca.longitude || this.locationInfo.longitude });uni.navigateTo({ url: 'plugin://routePlan/index?key=' + this.key + '&referer=' + this.referer + '&endPoint=' + endPoint });}, //获取天气
     getWeather: function getWeather(city) {
       var that = this;
       var data = {
@@ -395,28 +366,6 @@ var chooseLocation = requirePlugin('chooseLocation');var _default = { data: func
         console.log(error);
       });
     },
-    // 获取当前地理位置
-    /* getLocal(latitude, longitude) {
-        let that = this;
-        that.$QQMapWX.reverseGeocoder({
-          location: {
-            latitude: latitude,
-            longitude: longitude
-          },
-          success: function (res) {
-            console.log('resres',res);
-    		 that.city  = res.result.ad_info.city
-    		 that.getCityid(res.result.ad_info.city)
-    		 
-          },
-          fail: function (res) {
-            console.log(res);
-          },
-          complete: function (res) {
-            // console.log(res);
-          }
-        });
-      }, */
     getCityid: function getCityid(name) {
       for (var i = 0; i < this.cityArray.length; i++) {
         for (var j = 0; j < this.cityArray[i].list.length; j++) {
@@ -495,16 +444,26 @@ var chooseLocation = requirePlugin('chooseLocation');var _default = { data: func
       console.log(item);
       item.cityid = this.cityid;
       var History = this.History;
-      if (History != '' && History.indexOf(item) == -1) {
-        if (History.length >= 5) {
-          History.splice(4, 3);
-        }
-        History.unshift(item);
+      if (History == '') {
+        History[0] = item;
         this.History = History;
         uni.setStorageSync('History', History);
-      } else if (this.History == '') {
-        this.History[0] = item;
-        uni.setStorageSync('History', this.History);
+      } else {
+        var exit = false;
+        for (var i = 0; i < History.length; i++) {
+          if (item.bus_staname == History[i].bus_staname) {
+            exit = false;
+            break;
+          } else {
+            exit = true;
+          }
+        }
+        if (exit) {
+          History.unshift(item);
+          History.splice(5, 1);
+          this.History = History;
+          uni.setStorageSync('History', History);
+        }
       }
       uni.navigateTo({
         url: "../Route/Route?bus_linenum=" + item.bus_linenum + "&bus_linestrid=" + item.bus_linestrid + "&bus_staname=" +

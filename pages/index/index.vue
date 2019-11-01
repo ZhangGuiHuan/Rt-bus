@@ -96,8 +96,8 @@
 				</view>
 			</view>
 		</view>
-		<view class="text-center" v-else>
-			<image src="../../static/bus.png" style="width: 100upx;height: 100upx;"></image>
+		<view class="text-center padding" v-else>
+			<button class="cu-btn block bg-blue lg" open-type="share"><text class="cuIcon-share"></text> 分享给好友</button>
 		</view>
 	</view>
 </template>
